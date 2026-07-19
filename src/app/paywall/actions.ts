@@ -8,7 +8,7 @@ import { headers } from 'next/headers'
 export async function applyCoupon(formData: FormData) {
   const code = formData.get('code')
   
-  if (code !== 'SID_DRDROID') {
+  if (typeof code !== 'string' || code.trim().toUpperCase() !== 'SID_DRDROID') {
     return { error: 'Invalid coupon code' }
   }
 
