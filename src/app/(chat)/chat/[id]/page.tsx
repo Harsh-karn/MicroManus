@@ -21,7 +21,7 @@ export default async function ChatPage({ params }: { params: { id: string } }) {
   const initialMessages = (messages || []).map((msg) => ({
     id: msg.id,
     role: msg.role as 'user' | 'assistant' | 'system' | 'data',
-    content: msg.content,
+    parts: [{ type: 'text', text: msg.content }],
   }))
 
   return (
