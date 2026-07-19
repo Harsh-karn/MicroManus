@@ -5,6 +5,7 @@ import { saveApiKey, getApiKeysStatus } from './actions'
 import { PRICING_TABLE, Provider } from '@/lib/pricing'
 import { LogoutButton } from '@/components/LogoutButton'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 export default function SettingsPage() {
   const [provider, setProvider] = useState<Provider>('anthropic')
@@ -13,6 +14,7 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(false)
   const [status, setStatus] = useState<Record<string, boolean>>({})
   const [selectedModel, setSelectedModel] = useState<string>('')
+  const router = useRouter()
 
   // Load configured keys on mount
   useEffect(() => {
@@ -43,25 +45,44 @@ export default function SettingsPage() {
     alert('Model preferences saved locally. Will be used for new chats.')
   }
 
-  const handleSaveKey = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleSaveKey = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault()
     setLoading(true)
     
-    const formData = new FormData()
-    formData.append('provider', provider)
-    formData.append('apiKey', apiKey)
-    if (endpoint) formData.append('endpoint', endpoint)
-
-    const res = await saveApiKey(formData)
-    
-    if (res.error) {
-      alert(res.error)
-    } else {
-      alert('API key saved securely!')
-      setStatus({ ...status, [provider]: true })
-      setApiKey('')
+    // Save model preference
+    localStorage.setItem('preferredProvider', provider)
+    localStorage.setItem('preferredModel', selectedModel)
+    if (endpoint) {
+      localStorage.setItem('endpointOverride', endpoint)
     }
+
+    if (apiKey) {
+      const formData = new FormData()
+      formData.append('provider', provider)
+      formData.append('apiKey', apiKey)
+      if (endpoint) formData.append('endpoint', endpoint)
+
+      const res = await saveApiKey(formData)
+      
+      if (res.error) {
+        alert(res.error)
+        setLoading(false)
+        return false
+      } else {
+        setStatus({ ...status, [provider]: true })
+        setApiKey('')
+      }
+    }
+    
     setLoading(false)
+    return true
+  }
+
+  const handleApplyAndGoBack = async () => {
+    const success = await handleSaveKey()
+    if (success) {
+      router.push('/')
+    }
   }
 
   return (
@@ -123,7 +144,7 @@ export default function SettingsPage() {
 
               <button
                 type="submit"
-                disabled={loading || !apiKey}
+                disabled={loading || (!apiKey && !status[provider])}
                 className="w-full rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-95 mt-2"
               >
                 Save Key to Vault
@@ -152,6 +173,16 @@ export default function SettingsPage() {
                 className="w-full rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm font-semibold text-zinc-700 shadow-sm hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 transition-all active:scale-95"
               >
                 Set as Default for Chats
+              </button>
+            </div>
+            
+            <div className="mt-8 border-t border-zinc-100 pt-8">
+              <button
+                onClick={handleApplyAndGoBack}
+                disabled={loading}
+                className="w-full rounded-xl bg-zinc-900 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:ring-offset-1 transition-all active:scale-95"
+              >
+                Apply & Back to Chat
               </button>
             </div>
           </div>
