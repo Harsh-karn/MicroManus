@@ -54,6 +54,15 @@ export function Sidebar({ threads, activeThreadId, credits }: { threads: Thread[
         <Link href="/settings" className="block text-sm text-gray-400 hover:text-white transition-colors">
           Settings
         </Link>
+        <button 
+          onClick={async () => {
+            const { signOut } = await import('@/app/(chat)/actions')
+            await signOut()
+          }} 
+          className="w-full text-left text-sm text-red-400 hover:text-red-300 transition-colors pt-4 mt-4 border-t border-gray-800"
+        >
+          Log Out
+        </button>
       </div>
     </div>
   )
