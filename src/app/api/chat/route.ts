@@ -17,6 +17,11 @@ export async function POST(req: Request) {
     return new Response('Unauthorized', { status: 401 })
   }
 
+  const { data: userData } = await supabase.from('users').select('credits').eq('id', user.id).single()
+  if (!userData || userData.credits <= 0) {
+    return new Response('Insufficient credits. Please top up.', { status: 403 })
+  }
+
   // Get user's preferred model from the client, or default to some fallback
   // Wait, in this route we need to know the requested model.
   // We can pass `modelId` and `providerName` in the request body from the client.
@@ -120,18 +125,11 @@ export async function POST(req: Request) {
         cost_usd: costUsd,
       })
 
-      // We should also deduct credit cost (or just log it)
-      // The prompt says: "Cost to be distributed by input / output / cache tokens."
-      // The requirement doesn't explicitly state reducing the 5 credits incrementally (e.g. 1 credit = $1).
-      // It just says: "paywall ... get 5 credits ... Cost to be calculated based on the model connected... Cost to be distributed... Stats page where I can see cost & stats".
-      // Usually "5 credits" means 5 chats or $5 worth. We'll leave it as stats tracking for now, but to be safe, deduct the cost from credits if they map 1:1 to USD.
-      const { data: userData } = await supabase.from('users').select('credits').eq('id', user.id).single()
-      if (userData) {
-        // If credits represent USD, we can subtract `costUsd`
-        // But the prompt says "user receives 5 credits". 
-        // Let's just deduct 1 credit per chat to keep it simple, or leave credits as is.
-        // Actually, I'll deduct 1 credit for every new thread created, not per message. 
-        // But for this route, we will just track the cost in `messages` table.
+      // Deduct 1 credit for the interaction
+      // Fetch latest credits to ensure we don't go below 0 (though we checked at the start)
+      const { data: latestUserData } = await supabase.from('users').select('credits').eq('id', user.id).single()
+      if (latestUserData && latestUserData.credits > 0) {
+        await supabase.from('users').update({ credits: latestUserData.credits - 1 }).eq('id', user.id)
       }
     }
   })

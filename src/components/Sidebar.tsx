@@ -10,13 +10,18 @@ type Thread = {
   created_at: string
 }
 
-export function Sidebar({ threads, activeThreadId }: { threads: Thread[], activeThreadId?: string }) {
+export function Sidebar({ threads, activeThreadId, credits }: { threads: Thread[], activeThreadId?: string, credits: number }) {
   const router = useRouter()
 
   return (
     <div className="flex h-full w-64 flex-col bg-gray-900 text-white">
       <div className="p-4">
-        <h1 className="mb-6 text-xl font-bold">MicroManus</h1>
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-xl font-bold">MicroManus</h1>
+          <div className="text-xs font-semibold bg-gray-800 px-2 py-1 rounded-full text-indigo-400">
+            {credits} {credits === 1 ? 'Credit' : 'Credits'}
+          </div>
+        </div>
         <Link
           href="/"
           className="flex w-full items-center gap-2 rounded-md border border-gray-700 p-2 text-sm transition-colors hover:bg-gray-800"

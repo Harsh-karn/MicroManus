@@ -22,6 +22,20 @@ export async function getThreads() {
   return threads || []
 }
 
+export async function getCredits() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return 0
+
+  const { data } = await supabase
+    .from('users')
+    .select('credits')
+    .eq('id', user.id)
+    .single()
+
+  return data?.credits || 0
+}
+
 export async function createThread(title: string = 'New Chat') {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()

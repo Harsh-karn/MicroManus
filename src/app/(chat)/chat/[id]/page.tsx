@@ -16,7 +16,7 @@ export default function ChatPage({ params }: { params: { id: string } }) {
   }, [])
 
   const [input, setInput] = useState('')
-  const { messages, status, sendMessage } = useChat()
+  const { messages, status, sendMessage, error } = useChat()
 
   const isLoading = status === 'streaming' || status === 'submitted'
 
@@ -109,6 +109,14 @@ export default function ChatPage({ params }: { params: { id: string } }) {
             <div className="bg-gray-100 text-gray-800 rounded-2xl px-5 py-3 flex items-center gap-2">
               <Loader2Icon className="animate-spin" size={16} />
               Thinking...
+            </div>
+          </div>
+        )}
+        {error && (
+          <div className="flex justify-center my-4">
+            <div className="bg-red-50 text-red-600 rounded-2xl px-5 py-3 flex items-center gap-2 border border-red-200">
+              <span className="font-semibold">Error:</span>
+              {error.message || 'Something went wrong. Do you have enough credits?'}
             </div>
           </div>
         )}
