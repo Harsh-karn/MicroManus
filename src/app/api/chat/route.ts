@@ -5,6 +5,7 @@ import { webSearch } from '@/lib/tools/search'
 import { generatePdfReport } from '@/lib/tools/pdf'
 import { createOpenAI } from '@ai-sdk/openai'
 import { createAnthropic } from '@ai-sdk/anthropic'
+import { createGoogleGenerativeAI } from '@ai-sdk/google'
 import { streamText, tool, isStepCount } from 'ai'
 
 export async function POST(req: Request) {
@@ -27,7 +28,7 @@ export async function POST(req: Request) {
   // We can pass `modelId` and `providerName` in the request body from the client.
   const reqBody = await req.clone().json().catch(() => ({}))
   const providerName = (reqBody.provider as Provider) || 'anthropic'
-  const modelId = reqBody.model || 'claude-3-5-sonnet-20240620'
+  const modelId = reqBody.model || 'claude-3-5-sonnet-20241022'
 
   // Fetch the API key for this provider
   const { data: apiKeyRecord } = await supabase
@@ -61,6 +62,18 @@ export async function POST(req: Request) {
     const openai = createOpenAI({
       apiKey,
       baseURL: endpointOverride || 'https://api.moonshot.cn/v1',
+    })
+    aiModel = openai(modelId)
+  } else if (providerName === 'gemini') {
+    const google = createGoogleGenerativeAI({
+      apiKey,
+      baseURL: endpointOverride || undefined,
+    })
+    aiModel = google(modelId)
+  } else if (providerName === 'groq') {
+    const openai = createOpenAI({
+      apiKey,
+      baseURL: endpointOverride || 'https://api.groq.com/openai/v1',
     })
     aiModel = openai(modelId)
   } else {

@@ -59,6 +59,8 @@ export async function getApiKeysStatus() {
     openai: false,
     anthropic: false,
     kimi: false,
+    gemini: false,
+    groq: false,
   }
 
   if (data) {
