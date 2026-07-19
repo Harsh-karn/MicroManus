@@ -28,7 +28,7 @@ export async function applyCoupon(formData: FormData) {
 
   const { error } = await supabaseAdmin
     .from('users')
-    .upsert({ id: user.id, email: user.email, credits: 5, has_paid: true }, { onConflict: 'id' })
+    .upsert({ id: user.id, email: user.email || '', credits: 5, has_paid: true }, { onConflict: 'id' })
 
   if (error) {
     console.error(error)
