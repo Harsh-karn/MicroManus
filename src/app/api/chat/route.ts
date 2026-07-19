@@ -9,7 +9,8 @@ import { createGoogleGenerativeAI } from '@ai-sdk/google'
 import { streamText, tool, isStepCount } from 'ai'
 
 export async function POST(req: Request) {
-  const { messages, threadId, endpointOverride } = await req.json()
+  const body = await req.json()
+  const { messages, threadId, endpointOverride, provider, model } = body
 
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -26,9 +27,8 @@ export async function POST(req: Request) {
   // Get user's preferred model from the client, or default to some fallback
   // Wait, in this route we need to know the requested model.
   // We can pass `modelId` and `providerName` in the request body from the client.
-  const reqBody = await req.clone().json().catch(() => ({}))
-  const providerName = (reqBody.provider as Provider) || 'anthropic'
-  const modelId = reqBody.model || 'claude-3-5-sonnet-20241022'
+  const providerName = (provider as Provider) || 'anthropic'
+  const modelId = model || 'claude-3-5-sonnet-20241022'
 
   // Fetch the API key for this provider
   const { data: apiKeyRecord } = await supabase
