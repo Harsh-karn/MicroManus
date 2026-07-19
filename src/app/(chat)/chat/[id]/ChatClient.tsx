@@ -16,9 +16,9 @@ export function ChatClient({ params, initialMessages = [] }: { params: { id: str
   }, [])
 
   const [input, setInput] = useState('')
-  const { messages, status, append, error } = useChat({ 
+  const { messages, status, sendMessage, error } = useChat({ 
     id: params.id,
-    initialMessages 
+    messages: initialMessages 
   })
 
   const isLoading = status === 'streaming' || status === 'submitted'
@@ -30,8 +30,8 @@ export function ChatClient({ params, initialMessages = [] }: { params: { id: str
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!input.trim() || isLoading) return
-    append(
-      { role: 'user', content: input },
+    sendMessage(
+      { role: 'user', parts: [{ type: 'text', text: input }] },
       {
         body: {
           threadId: params.id,
@@ -55,8 +55,8 @@ export function ChatClient({ params, initialMessages = [] }: { params: { id: str
     const initialMsg = sessionStorage.getItem(`initial_msg_${params.id}`)
     if (initialMsg && messages.length === 0) {
       sessionStorage.removeItem(`initial_msg_${params.id}`)
-      append(
-        { role: 'user', content: initialMsg },
+      sendMessage(
+        { role: 'user', parts: [{ type: 'text', text: initialMsg }] },
         {
           body: {
             threadId: params.id,
@@ -67,7 +67,7 @@ export function ChatClient({ params, initialMessages = [] }: { params: { id: str
         }
       )
     }
-  }, [params.id, append, messages.length, provider, model, endpoint])
+  }, [params.id, sendMessage, messages.length, provider, model, endpoint])
 
   return (
     <div className="flex flex-col h-full bg-zinc-50 relative">
