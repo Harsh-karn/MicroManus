@@ -18,13 +18,7 @@ export function ChatClient({ params, initialMessages = [] }: { params: { id: str
   const [input, setInput] = useState('')
   const { messages, status, sendMessage, error } = useChat({ 
     id: params.id,
-    initialMessages,
-    body: {
-      threadId: params.id,
-      provider,
-      model,
-      endpointOverride: endpoint
-    }
+    messages: initialMessages,
   });
 
   useEffect(() => {
