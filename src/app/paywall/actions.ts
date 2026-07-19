@@ -19,8 +19,14 @@ export async function applyCoupon(formData: FormData) {
     return { error: 'Not authenticated' }
   }
 
-  // Update credits using upsert in case the trigger didn't run
-  const { error } = await supabase
+  // Use service role key to bypass RLS for credit update/insert
+  const { createClient: createAdminClient } = await import('@supabase/supabase-js')
+  const supabaseAdmin = createAdminClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://dummy.supabase.co',
+    process.env.SUPABASE_SERVICE_ROLE_KEY || 'dummy_service_key'
+  )
+
+  const { error } = await supabaseAdmin
     .from('users')
     .upsert({ id: user.id, email: user.email, credits: 5, has_paid: true }, { onConflict: 'id' })
 
