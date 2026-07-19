@@ -72,8 +72,8 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // If user is authenticated, check their credits unless they are on /paywall or /settings
-  if (user && !url.pathname.startsWith('/paywall') && !url.pathname.startsWith('/auth')) {
+  // If user is authenticated, check their credits unless they are on /paywall, /auth, or /api/coupon
+  if (user && !url.pathname.startsWith('/paywall') && !url.pathname.startsWith('/auth') && !url.pathname.startsWith('/api/coupon')) {
     // We fetch user credits from the DB
     const { data: userData } = await supabase
       .from('users')
