@@ -5,7 +5,7 @@ import { webSearch } from '@/lib/tools/search'
 import { generatePdfReport } from '@/lib/tools/pdf'
 import { createOpenAI } from '@ai-sdk/openai'
 import { createAnthropic } from '@ai-sdk/anthropic'
-import { streamText } from 'ai'
+import { streamText, tool, isStepCount } from 'ai'
 
 export async function POST(req: Request) {
   const { messages, threadId, endpointOverride } = await req.json()
@@ -88,7 +88,7 @@ export async function POST(req: Request) {
       web_search: webSearch,
       create_pdf: generatePdfReport,
     },
-    maxSteps: 5,
+    stopWhen: isStepCount(5),
 
     onFinish: async (event) => {
       // Calculate token usage and cost
