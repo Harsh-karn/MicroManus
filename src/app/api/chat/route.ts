@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { decrypt } from '@/lib/crypto'
 import { PRICING_TABLE, Provider } from '@/lib/pricing'
-import { braveSearch } from '@/lib/tools/search'
+import { webSearch } from '@/lib/tools/search'
 import { generatePdfReport } from '@/lib/tools/pdf'
 import { createOpenAI } from '@ai-sdk/openai'
 import { createAnthropic } from '@ai-sdk/anthropic'
@@ -76,9 +76,12 @@ export async function POST(req: Request) {
   const result = await streamText({
     model: aiModel,
     messages,
+    system: `You are an AI research assistant. You have access to the internet via web search, and you can create PDF reports. 
+    You are paid 1 credit per interaction, so be concise but highly accurate. 
+    If a user asks for a report, generate it using the create_pdf tool.`,
     tools: {
-      braveSearch,
-      generatePdfReport,
+      web_search: webSearch,
+      create_pdf: generatePdfReport,
     },
 
     onFinish: async (event) => {

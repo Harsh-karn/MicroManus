@@ -2,36 +2,30 @@
 import { tool } from 'ai'
 import { z } from 'zod'
 
-export const braveSearch = tool({
-  description: 'Search the web using Brave Search API to gather information for research.',
+export const webSearch = tool({
+  description: 'Search the web using SERP API to gather information for research.',
   parameters: z.object({
     query: z.string().describe('The search query to look up on the web.'),
   }),
   execute: async ({ query }) => {
     try {
-      const apiKey = process.env.BRAVE_SEARCH_API_KEY
+      const apiKey = process.env.SERP_API_KEY
       if (!apiKey) {
-        throw new Error('Brave Search API key not configured.')
+        throw new Error('SERP API key not configured.')
       }
 
-      const res = await fetch(`https://api.search.brave.com/res/v1/web/search?q=${encodeURIComponent(query)}&count=5`, {
-        headers: {
-          'Accept': 'application/json',
-          'Accept-Encoding': 'gzip',
-          'X-Subscription-Token': apiKey
-        }
-      })
+      const res = await fetch(`https://serpapi.com/search.json?q=${encodeURIComponent(query)}&api_key=${apiKey}&engine=google&num=5`)
 
       if (!res.ok) {
-        throw new Error(`Brave Search failed with status: ${res.status}`)
+        throw new Error(`SERP API failed with status: ${res.status}`)
       }
 
       const data = await res.json()
       
-      const results = data.web?.results?.map((r: any) => ({
+      const results = data.organic_results?.map((r: any) => ({
         title: r.title,
-        url: r.url,
-        description: r.description,
+        url: r.link,
+        description: r.snippet,
       })) || []
 
       return JSON.stringify(results)
