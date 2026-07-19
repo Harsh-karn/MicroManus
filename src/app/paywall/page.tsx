@@ -1,12 +1,14 @@
 'use client'
 
 import { useState } from 'react'
-import { applyCoupon, createCheckoutSession } from './actions'
+import { createCheckoutSession } from './actions'
 import { LogoutButton } from '@/components/LogoutButton'
+import { useRouter } from 'next/navigation'
 
 export default function PaywallPage() {
   const [loading, setLoading] = useState(false)
   const [couponError, setCouponError] = useState('')
+  const router = useRouter()
 
   const handleApplyCoupon = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -14,10 +16,25 @@ export default function PaywallPage() {
     setCouponError('')
     
     const formData = new FormData(e.currentTarget)
-    const result = await applyCoupon(formData)
-    
-    if (result?.error) {
-      setCouponError(result.error)
+    const code = formData.get('code')
+
+    try {
+      const res = await fetch('/api/coupon', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code }),
+      })
+      const data = await res.json()
+
+      if (!res.ok || data.error) {
+        setCouponError(data.error || 'Unknown error')
+        setLoading(false)
+      } else {
+        // Success — redirect to home
+        router.push('/')
+      }
+    } catch (err: any) {
+      setCouponError(`Network error: ${err.message}`)
       setLoading(false)
     }
   }

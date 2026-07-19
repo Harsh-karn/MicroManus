@@ -19,20 +19,50 @@ export async function applyCoupon(formData: FormData) {
     return { error: 'Not authenticated' }
   }
 
-  // Use service role key to bypass RLS for credit update/insert
-  const { createClient: createAdminClient } = await import('@supabase/supabase-js')
-  const supabaseAdmin = createAdminClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://dummy.supabase.co',
-    process.env.SUPABASE_SERVICE_ROLE_KEY || 'dummy_service_key'
-  )
+  try {
+    // Use service role key to bypass RLS
+    const { createClient: createAdminClient } = await import('@supabase/supabase-js')
+    const supabaseAdmin = createAdminClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    )
 
-  const { error } = await supabaseAdmin
-    .from('users')
-    .upsert({ id: user.id, email: user.email || '', credits: 5, has_paid: true }, { onConflict: 'id' })
+    // Check if user row already exists
+    const { data: existingUser } = await supabaseAdmin
+      .from('users')
+      .select('id')
+      .eq('id', user.id)
+      .single()
 
-  if (error) {
-    console.error(error)
-    return { error: 'Failed to apply coupon' }
+    let dbError
+    if (existingUser) {
+      // Row exists → update it
+      const { error } = await supabaseAdmin
+        .from('users')
+        .update({ credits: 5, has_paid: true })
+        .eq('id', user.id)
+      dbError = error
+    } else {
+      // Row doesn't exist → insert it
+      const { error } = await supabaseAdmin
+        .from('users')
+        .insert({
+          id: user.id,
+          email: user.email || '',
+          provider: 'github',
+          credits: 5,
+          has_paid: true,
+        })
+      dbError = error
+    }
+
+    if (dbError) {
+      console.error('Supabase coupon error:', dbError)
+      return { error: `DB Error: ${dbError.message}` }
+    }
+  } catch (err: any) {
+    console.error('Coupon exception:', err)
+    return { error: `Exception: ${err.message}` }
   }
 
   redirect('/')
