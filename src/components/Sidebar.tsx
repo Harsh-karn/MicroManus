@@ -1,6 +1,6 @@
 'use client'
 
-import { PlusIcon, MessageSquareIcon } from 'lucide-react'
+import { PlusIcon, MessageSquareIcon, KeyIcon, BarChart2Icon, LogOutIcon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
@@ -49,20 +49,23 @@ export function Sidebar({ threads, activeThreadId, credits }: { threads: Thread[
         ))}
       </div>
 
-      <div className="p-4 border-t border-zinc-900 space-y-1">
-        <Link href="/stats" className="block text-sm font-medium text-zinc-400 hover:text-white transition-colors px-3 py-2 rounded-lg hover:bg-zinc-900">
-          Usage Stats
+      <div className="p-4 border-t border-zinc-900 space-y-2">
+        <Link href="/settings" className="flex w-full items-center gap-2 text-sm font-medium text-indigo-300 hover:text-indigo-200 transition-all px-3 py-2.5 rounded-lg bg-indigo-500/10 border border-indigo-500/20 hover:bg-indigo-500/20 shadow-sm mb-1">
+          <KeyIcon size={16} />
+          Configure your API
         </Link>
-        <Link href="/settings" className="block text-sm font-medium text-zinc-400 hover:text-white transition-colors px-3 py-2 rounded-lg hover:bg-zinc-900">
-          Settings
+        <Link href="/stats" className="flex items-center gap-2 text-sm font-medium text-zinc-400 hover:text-white transition-colors px-3 py-2 rounded-lg hover:bg-zinc-900">
+          <BarChart2Icon size={16} />
+          Usage Stats
         </Link>
         <button 
           onClick={async () => {
             const { signOut } = await import('@/app/(chat)/actions')
             await signOut()
           }} 
-          className="w-full text-left text-sm font-medium text-red-400 hover:text-red-300 transition-colors px-3 py-2 rounded-lg hover:bg-red-500/10 mt-2"
+          className="flex w-full items-center gap-2 text-left text-sm font-medium text-red-400 hover:text-red-300 transition-colors px-3 py-2 rounded-lg hover:bg-red-500/10"
         >
+          <LogOutIcon size={16} />
           Log Out
         </button>
       </div>

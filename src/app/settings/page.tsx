@@ -74,8 +74,8 @@ export default function SettingsPage() {
       </div>
       <div className="max-w-3xl w-full bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-zinc-100 p-8 md:p-10 space-y-8 h-fit mt-16 md:mt-12">
         <div className="space-y-1">
-          <h2 className="text-2xl font-extrabold text-zinc-900 tracking-tight">Settings</h2>
-          <p className="text-sm font-medium text-zinc-500">Configure your API keys and select default models.</p>
+          <h2 className="text-2xl font-extrabold text-zinc-900 tracking-tight">Configure API</h2>
+          <p className="text-sm font-medium text-zinc-500">Add your API keys and select default models.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 border-t border-zinc-100 pt-8">
