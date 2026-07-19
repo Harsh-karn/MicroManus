@@ -31,7 +31,7 @@ export function ChatClient({ params, initialMessages = [] }: { params: { id: str
     e.preventDefault()
     if (!input.trim() || isLoading) return
     sendMessage(
-      { role: 'user', parts: [{ type: 'text', text: input }] },
+      { text: input },
       {
         body: {
           threadId: params.id,
@@ -56,7 +56,7 @@ export function ChatClient({ params, initialMessages = [] }: { params: { id: str
     if (initialMsg && messages.length === 0) {
       sessionStorage.removeItem(`initial_msg_${params.id}`)
       sendMessage(
-        { role: 'user', parts: [{ type: 'text', text: initialMsg }] },
+        { text: initialMsg },
         {
           body: {
             threadId: params.id,
