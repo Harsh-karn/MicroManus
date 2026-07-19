@@ -81,7 +81,7 @@ export async function middleware(request: NextRequest) {
       .eq('id', user.id)
       .single()
 
-    if (userData && userData.credits <= 0) {
+    if (!userData || userData.credits <= 0) {
       url.pathname = '/paywall'
       return NextResponse.redirect(url)
     }

@@ -19,11 +19,10 @@ export async function applyCoupon(formData: FormData) {
     return { error: 'Not authenticated' }
   }
 
-  // Update credits
+  // Update credits using upsert in case the trigger didn't run
   const { error } = await supabase
     .from('users')
-    .update({ credits: 5, has_paid: true })
-    .eq('id', user.id)
+    .upsert({ id: user.id, email: user.email, credits: 5, has_paid: true }, { onConflict: 'id' })
 
   if (error) {
     console.error(error)

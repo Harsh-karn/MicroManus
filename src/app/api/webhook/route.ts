@@ -33,8 +33,7 @@ export async function POST(req: Request) {
 
       const { error } = await supabaseAdmin
         .from('users')
-        .update({ credits: 5, has_paid: true })
-        .eq('id', userId)
+        .upsert({ id: userId, email: session.customer_email || '', credits: 5, has_paid: true }, { onConflict: 'id' })
 
       if (error) {
         console.error('Error updating user credits:', error)
