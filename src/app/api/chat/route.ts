@@ -88,6 +88,7 @@ export async function POST(req: Request) {
       web_search: webSearch,
       create_pdf: generatePdfReport,
     },
+    maxSteps: 5,
 
     onFinish: async (event) => {
       // Calculate token usage and cost
