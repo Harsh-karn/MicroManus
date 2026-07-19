@@ -21,6 +21,12 @@ export function ChatClient({ params, initialMessages = [] }: { params: { id: str
   const { messages, status, sendMessage, error } = useChat({ 
     id: params.id,
     messages: initialMessages,
+    body: {
+      threadId: params.id,
+      provider,
+      model,
+      endpointOverride: endpoint
+    }
   });
 
   useEffect(() => {
@@ -41,15 +47,7 @@ export function ChatClient({ params, initialMessages = [] }: { params: { id: str
     e.preventDefault()
     if (!input.trim() || isLoading) return
     sendMessage(
-      { text: input },
-      {
-        body: {
-          threadId: params.id,
-          provider,
-          model,
-          endpointOverride: endpoint
-        }
-      }
+      { text: input }
     )
     setInput('')
   }
@@ -67,15 +65,7 @@ export function ChatClient({ params, initialMessages = [] }: { params: { id: str
     if (initialMsg && messages.length === 0) {
       sessionStorage.removeItem(`initial_msg_${params.id}`)
       sendMessage(
-        { text: initialMsg },
-        {
-          body: {
-            threadId: params.id,
-            provider,
-            model,
-            endpointOverride: endpoint
-          }
-        }
+        { text: initialMsg }
       )
     }
   }, [params.id, sendMessage, messages.length, provider, model, endpoint, isInitialized])
