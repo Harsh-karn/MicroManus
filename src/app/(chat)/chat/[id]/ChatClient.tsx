@@ -8,11 +8,13 @@ export function ChatClient({ params, initialMessages = [] }: { params: { id: str
   const [provider, setProvider] = useState('anthropic')
   const [model, setModel] = useState('claude-3-5-sonnet-20240620')
   const [endpoint, setEndpoint] = useState('')
+  const [isInitialized, setIsInitialized] = useState(false)
 
   useEffect(() => {
     setProvider(localStorage.getItem('preferredProvider') || 'anthropic')
     setModel(localStorage.getItem('preferredModel') || 'claude-3-5-sonnet-20240620')
     setEndpoint(localStorage.getItem('endpointOverride') || '')
+    setIsInitialized(true)
   }, [])
 
   const [input, setInput] = useState('')
@@ -59,6 +61,7 @@ export function ChatClient({ params, initialMessages = [] }: { params: { id: str
   }, [messages])
 
   useEffect(() => {
+    if (!isInitialized) return
     // Check if there's an initial message to send (from NewChatPage)
     const initialMsg = sessionStorage.getItem(`initial_msg_${params.id}`)
     if (initialMsg && messages.length === 0) {
@@ -75,7 +78,7 @@ export function ChatClient({ params, initialMessages = [] }: { params: { id: str
         }
       )
     }
-  }, [params.id, sendMessage, messages.length, provider, model, endpoint])
+  }, [params.id, sendMessage, messages.length, provider, model, endpoint, isInitialized])
 
   return (
     <div className="flex flex-col h-full bg-zinc-50 relative">
