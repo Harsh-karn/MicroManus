@@ -18,8 +18,22 @@ export function ChatClient({ params, initialMessages = [] }: { params: { id: str
   const [input, setInput] = useState('')
   const { messages, status, sendMessage, error } = useChat({ 
     id: params.id,
-    messages: initialMessages 
-  })
+    initialMessages,
+    body: {
+      threadId: params.id,
+      provider,
+      model,
+      endpointOverride: endpoint
+    }
+  });
+
+  useEffect(() => {
+    console.log('[ChatClient] messages:', messages);
+    console.log('[ChatClient] status:', status);
+    if (error) {
+      console.error('[ChatClient] error:', error);
+    }
+  }, [messages, status, error]);
 
   const isLoading = status === 'streaming' || status === 'submitted'
 
@@ -127,9 +141,14 @@ export function ChatClient({ params, initialMessages = [] }: { params: { id: str
         )}
         {error && (
           <div className="flex justify-center my-6">
-            <div className="bg-red-50 text-red-700 rounded-2xl px-6 py-4 flex items-center gap-3 border border-red-200 shadow-sm max-w-lg text-sm">
-              <span className="font-bold">Error:</span>
-              <span>{error.message || 'Something went wrong. Do you have enough credits?'}</span>
+            <div className="bg-red-50 text-red-700 rounded-2xl px-6 py-4 flex flex-col gap-2 border border-red-200 shadow-sm max-w-lg text-sm">
+              <div className="flex items-center gap-3">
+                <span className="font-bold">Error:</span>
+                <span>{error.message || 'Something went wrong.'}</span>
+              </div>
+              <div className="text-xs text-red-600 mt-1">
+                Hint: Check if you have enough credits and if your <strong>API Key</strong> is configured in <a href="/settings" className="underline font-medium">Settings</a>.
+              </div>
             </div>
           </div>
         )}

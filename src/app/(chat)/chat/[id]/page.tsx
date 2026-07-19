@@ -2,7 +2,8 @@ import { ChatClient } from './ChatClient'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 
-export default async function ChatPage({ params }: { params: { id: string } }) {
+export default async function ChatPage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params;
   const supabase = await createClient()
 
   const { data: userData, error: userError } = await supabase.auth.getUser()
@@ -14,7 +15,7 @@ export default async function ChatPage({ params }: { params: { id: string } }) {
   const { data: messages, error } = await supabase
     .from('messages')
     .select('id, role, content, created_at')
-    .eq('thread_id', params.id)
+    .eq('thread_id', resolvedParams.id)
     .order('created_at', { ascending: true })
 
   // Map messages to the format expected by useChat
@@ -26,7 +27,7 @@ export default async function ChatPage({ params }: { params: { id: string } }) {
 
   return (
     <ChatClient 
-      params={params} 
+      params={resolvedParams} 
       initialMessages={initialMessages} 
     />
   )
