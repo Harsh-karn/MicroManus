@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { applyCoupon, createCheckoutSession } from './actions'
+import { LogoutButton } from '@/components/LogoutButton'
 
 export default function PaywallPage() {
   const [loading, setLoading] = useState(false)
@@ -31,8 +32,11 @@ export default function PaywallPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50">
-      <div className="w-full max-w-lg rounded-xl bg-white p-8 shadow-xl">
+    <div className="flex min-h-screen items-center justify-center bg-gray-50 relative">
+      <div className="absolute top-8 right-8">
+        <LogoutButton />
+      </div>
+      <div className="w-full max-w-lg rounded-xl bg-white p-8 shadow-xl mt-12">
         <div className="text-center">
           <h2 className="text-3xl font-extrabold text-gray-900">
             Unlock MicroManus

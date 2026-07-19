@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import { saveApiKey, getApiKeysStatus } from './actions'
 import { PRICING_TABLE, Provider } from '@/lib/pricing'
+import { LogoutButton } from '@/components/LogoutButton'
+import Link from 'next/link'
 
 export default function SettingsPage() {
   const [provider, setProvider] = useState<Provider>('anthropic')
@@ -63,8 +65,14 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="min-h-screen p-8 bg-gray-50 flex justify-center">
-      <div className="max-w-2xl w-full bg-white rounded-xl shadow-xl p-8 space-y-8 h-fit">
+    <div className="min-h-screen p-8 bg-gray-50 flex justify-center relative">
+      <div className="absolute top-8 right-8 flex gap-4">
+        <Link href="/" className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-200">
+          Back to Chat
+        </Link>
+        <LogoutButton />
+      </div>
+      <div className="max-w-2xl w-full bg-white rounded-xl shadow-xl p-8 space-y-8 h-fit mt-12">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Settings</h2>
           <p className="mt-1 text-sm text-gray-500">Configure your API keys and select models.</p>
